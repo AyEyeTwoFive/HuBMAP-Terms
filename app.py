@@ -1,12 +1,13 @@
 import pandas as pd
 from dash import Dash, Input, Output, dcc, html, dash_table
 from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
 
 # Load in data containing terms
 data = pd.read_csv('input.csv')
 
 # Initialize the Dash app
-app = Dash(__name__)
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Set the page title
 app.title = 'HuBMAP to HCA term'
@@ -15,15 +16,22 @@ app.title = 'HuBMAP to HCA term'
 # Function to determine style and text based on match quality
 def get_match_style_and_text(match_quality):
     if match_quality == 'yes':
-        return {'background-color': 'green', 'color': 'white'}, 'This is a good match'
+        return {'background-color': '#3bb54a', 'color': 'white'}, 'This is a good match'
     elif match_quality == 'no':
-        return {'background-color': 'red', 'color': 'white'}, 'This is a bad match'
+        return {'background-color': '#d9534f', 'color': 'white'}, 'This is a bad match'
     else:
-        return {'background-color': 'yellow'}, 'Match quality unknown'
+        return {'background-color': '#f0ad4e'}, 'Match quality unknown'
 
+
+# Define custom icons
+icons = {
+    'green': '✔️',
+    'red': '❌',
+    'yellow': '❓'
+}
 
 # Define the style of the app
-app.layout = html.Div(style={'font-family': 'Arial', 'max-width': '800px', 'margin': 'auto'}, children=[
+app.layout = dbc.Container(style={'font-family': 'Arial', 'max-width': '800px', 'margin': 'auto'}, children=[
     html.H1('HuBMAP to HCA term', style={'text-align': 'center'}),
     html.Div([
         dcc.Dropdown(
@@ -62,17 +70,19 @@ def update_output(selected_term):
             html.H4(f'Selected HuBMAP term: {selected_term}', style={'margin-bottom': '5px', 'text-align': 'left'}),
             html.Div([
                 html.Div('Best HCA Match: ' + corresponding_term, style={'padding': '10px', 'text-align': 'left'}),
-                html.Div(match_text,
-                         style={**match_style, 'padding': '10px', 'border-radius': '5px', 'margin-top': '5px'})
+                html.Div(
+                    icons.get(match_quality, '') + ' ' + match_text,
+                    style={**match_style, 'padding': '10px', 'border-radius': '5px', 'margin-top': '5px'}
+                )
             ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
         ], style={'background-color': '#f4f4f4', 'padding': '20px', 'border-radius': '5px'}),
 
-        dash_table.DataTable(
-            id='matching-terms-table-display',
-            columns=[{'name': 'Matching Terms', 'id': 'Matching Terms'}],
-            data=matching_terms_table_data.to_dict('records'),
-            style_table={'margin-top': '10px'},
-            style_cell={'textAlign': 'left', 'padding': '8px'}
+        dbc.Table.from_dataframe(
+            matching_terms_table_data,
+            header=False,
+            bordered=True,
+            responsive=True,
+            style={'margin-top': '10px'}
         )
     ]
 
