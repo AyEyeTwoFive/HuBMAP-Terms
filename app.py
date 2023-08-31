@@ -6,11 +6,23 @@ import dash_bootstrap_components as dbc
 # Load in data containing terms
 data = pd.read_csv('input.csv')
 
+
+external_stylesheets = [
+    {
+        "href": (
+            "https://fonts.googleapis.com/css2?"
+            "family=Lato:wght@400;700&display=swap"
+        ),
+        "rel": "stylesheet",
+    },
+]
+
+
 # Initialize the Dash app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Set the page title
-app.title = 'HuBMAP to HCA term'
+app.title = 'HuBMAP to HCA Term'
 
 # Define custom colors based on HubMAP website
 custom_colors = {
@@ -39,9 +51,22 @@ def get_match_style_and_text(match_quality):
 
 # Define the style of the app
 app.layout = dbc.Container(style={'font-family': 'Arial', 'max-width': '800px', 'margin': 'auto'}, children=[
-    html.H1('HuBMAP to HCA term', style={'text-align': 'center', 'color': custom_colors['text']}),
+    html.Div(
+        children=[
+            html.P(children="🦠", className="header-emoji"),
+            html.H1(
+                children="HuBMAP to HCA Term", className="header-title"
+            ),
+            html.P(
+                children=(
+                    "Find HCA terms that best match a given HuBMAP term"
+                ),
+                className="header-description",
+            ),
+        ],
+        className="header",),
     html.Div([
-        html.H4('Select a HuBMAP term', style={'margin-bottom': '10px', 'color': custom_colors['text']}),
+        html.H4('Select a HuBMAP term: ', style={'margin-bottom': '10px', 'color': custom_colors['text']}),
         dcc.Dropdown(
             id='term-dropdown',
             options=[{'label': term, 'value': term} for term in data.iloc[:, 0]],
