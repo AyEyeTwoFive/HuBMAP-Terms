@@ -6,18 +6,6 @@ import dash_bootstrap_components as dbc
 # Load in data containing terms
 data = pd.read_csv('input.csv')
 
-
-external_stylesheets = [
-    {
-        "href": (
-            "https://fonts.googleapis.com/css2?"
-            "family=Lato:wght@400;700&display=swap"
-        ),
-        "rel": "stylesheet",
-    },
-]
-
-
 # Initialize the Dash app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -45,7 +33,7 @@ def get_match_style_and_text(match_quality):
     if match_quality == 'yes':
         return {'background-color': custom_colors['green'], 'color': 'white'}, 'This is a good match'
     elif match_quality == 'no':
-        return {'background-color': custom_colors['red'], 'color': 'white'}, 'This is a bad match'
+        return {'background-color': custom_colors['red'], 'color': 'white'}, 'No match found'
     else:
         return {'background-color': custom_colors['yellow'], 'color': custom_colors['text']}, 'Match quality unknown'
 
@@ -96,18 +84,33 @@ def update_output(selected_term):
     matching_terms_table_data = data[data.iloc[:, 0] == selected_term].iloc[0, 1:11].to_frame(name='Matching Terms')
     matching_terms_table_data.reset_index(drop=True, inplace=True)
 
-    return [
+    output_display = [
         html.Div([
             html.H4(f'Selected HuBMAP term: {selected_term}', style={'margin-bottom': '5px', 'text-align': 'left', 'color': custom_colors['text']}),
-            html.H4(f'Best HCA Match: {corresponding_term}', style={'margin-bottom': '5px', 'text-align': 'left', 'color': custom_colors['text']}),
-            html.Div([
-                html.Div(
-                    icons.get(match_quality, '') + ' ' + match_text,
-                    style={**match_style, 'padding': '10px', 'border-radius': '5px', 'margin-top': '5px'}
-                )
-            ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
         ], style={'background-color': custom_colors['background'], 'padding': '20px', 'border-radius': '5px'}),
+    ]
 
+    if match_quality == 'no':
+        output_display.append(
+            html.Div([
+                html.H4('No match found', style={'margin-bottom': '5px', 'text-align': 'left', 'color': custom_colors['text']}),
+            ], style={'background-color': custom_colors['red'], 'padding': '20px', 'border-radius': '5px'})
+        )
+    elif match_quality != 'no':
+        output_display.append(
+            html.Div([
+                html.H4(f'Best HCA Match: {corresponding_term}', style={'margin-bottom': '5px', 'text-align': 'left', 'color': custom_colors['text']}),
+                html.Div([
+                    html.Div(
+                        icons.get(match_quality, '') + ' ' + match_text,
+                        style={**match_style, 'padding': '10px', 'border-radius': '5px', 'margin-top': '5px'}
+                    )
+                ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
+            ], style={'background-color': custom_colors['background'], 'padding': '20px', 'border-radius': '5px'})
+        )
+
+    return [
+        output_display,
         dbc.Table.from_dataframe(
             matching_terms_table_data,
             header=False,
