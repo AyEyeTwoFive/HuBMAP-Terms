@@ -123,20 +123,19 @@ def update_output(selected_term):
         # Show table when selected_term is not None
     )
 
-    if match_quality != 'no':
-        # Number the top 10 terms
-        table_caption = html.Caption(
-            'Top 10 Closest HCA Terms',
-            style={
-                'caption-side': 'top',
-                'text-align': 'left',
-                'color': custom_colors['text'],
-                'font-size': '24px'  # Adjust the font size as needed
-            }
-        )
-        matching_terms_table.children.insert(0, table_caption)
-        for i, row in enumerate(matching_terms_table.children[1].children):
-            row.children.insert(0, html.Td(f"{i + 1}."))  # Add numbering
+    # Number the top 10 terms
+    table_caption = html.Caption(
+        'Top 10 Closest HCA Terms',
+        style={
+            'caption-side': 'top',
+            'text-align': 'left',
+            'color': custom_colors['text'],
+            'font-size': '24px'  # Adjust the font size as needed
+        }
+    )
+    matching_terms_table.children.insert(0, table_caption)
+    for i, row in enumerate(matching_terms_table.children[1].children):
+        row.children.insert(0, html.Td(f"{i + 1}."))  # Add numbering
 
     return [
         output_display,
