@@ -114,15 +114,25 @@ def update_output(selected_term):
             ], style={'background-color': custom_colors['background'], 'padding': '20px', 'border-radius': '5px'})
         )
 
+    matching_terms_table = dbc.Table.from_dataframe(
+        matching_terms_table_data,
+        header=False,
+        bordered=False,  # Remove table borders
+        responsive=True,
+        style={'margin-top': '10px', 'display': 'block' if selected_term else 'none'}
+        # Show table when selected_term is not None
+    )
+
+    if match_quality != 'no':
+        # Number the top 10 terms
+        matching_terms_table.children.insert(0, html.Caption('Top 10 Closest HCA Terms',
+                                                             style={'caption-side': 'top', 'text-align': 'center'}))
+        for i, row in enumerate(matching_terms_table.children[1].children):
+            row.children.insert(0, html.Td(f"{i + 1}."))  # Add numbering
+
     return [
         output_display,
-        dbc.Table.from_dataframe(
-            matching_terms_table_data,
-            header=False,
-            bordered=True,
-            responsive=True,
-            style={'margin-top': '10px', 'display': 'block' if selected_term else 'none'}  # Show table when selected_term is not None
-        )
+        matching_terms_table
     ]
 
 # Run the app
