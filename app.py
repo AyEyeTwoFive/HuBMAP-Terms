@@ -31,11 +31,11 @@ icons = {
 # Function to determine style and text based on match quality
 def get_match_style_and_text(match_quality):
     if match_quality == 'yes':
-        return {'background-color': custom_colors['green'], 'color': 'white'}, 'This is a good match'
+        return {'background-color': custom_colors['green'], 'color': 'white'}, 'Good Match'
     elif match_quality == 'no':
-        return {'background-color': custom_colors['red'], 'color': 'white'}, 'No match found'
+        return {'background-color': custom_colors['red'], 'color': 'white'}, 'Match Not Found'
     else:
-        return {'background-color': custom_colors['yellow'], 'color': custom_colors['text']}, 'Match quality unknown'
+        return {'background-color': custom_colors['yellow'], 'color': custom_colors['text']}, 'Weak Match'
 
 # Define the style of the app
 app.layout = dbc.Container(style={'font-family': 'Arial', 'max-width': '800px', 'margin': 'auto'}, children=[
@@ -93,8 +93,13 @@ def update_output(selected_term):
     if match_quality == 'no':
         output_display.append(
             html.Div([
-                html.H4('No match found', style={'margin-bottom': '5px', 'text-align': 'left', 'color': custom_colors['text']}),
-            ], style={'background-color': custom_colors['red'], 'padding': '20px', 'border-radius': '5px'})
+                html.Div([
+                    html.Div(
+                        icons.get(match_quality, '') + ' ' + match_text,
+                        style={**match_style, 'padding': '10px', 'border-radius': '5px', 'margin-top': '5px'}
+                    )
+                ], style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}),
+            ], style={'background-color': custom_colors['background'], 'padding': '20px', 'border-radius': '5px'})
         )
     elif match_quality != 'no':
         output_display.append(
